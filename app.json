@@ -1,0 +1,5 @@
+{
+  "name": "BusBus",
+  "description": "Ann app for showing departure times of nearest busses",
+  "image": "heroku/java"
+}
