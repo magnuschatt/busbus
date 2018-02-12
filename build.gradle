@@ -56,3 +56,6 @@ shadowJar {
 }
 
 mainClassName = 'io.ktor.server.netty.DevelopmentEngine'
+
+task stage(dependsOn: ['build', 'clean'])
+build.mustRunAfter clean
