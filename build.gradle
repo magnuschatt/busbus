@@ -30,4 +30,4 @@ allprojects {
     }
 }
 
-task stage(dependsOn: ['build'])
+task stage(dependsOn: ['frontend:build', 'backend:build'])

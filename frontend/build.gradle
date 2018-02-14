@@ -15,6 +15,7 @@ ext.cssDir = "$project.buildDir.path/resources/main/css"
 ext.webDir = "${project(":backend").projectDir}/build/web"
 ext.webJsFile = "$webDir/${project.name}.js"
 ext.webCssFile = "$webDir/${project.name}.css"
+ext.herokuWebDir = "$rootDir/build/web"
 
 compileKotlin2Js {
     kotlinOptions.metaInfo = true
@@ -46,6 +47,11 @@ assemble.doLast {
     minifyJs.run()
     combineCss.run()
     minifyCss.run()
+
+    copy {
+        from webDir
+        into herokuWebDir
+    }
 }
 
 minifyJs {

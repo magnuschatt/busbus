@@ -1,1 +1,1 @@
-web: java $JAVA_OPTS -jar build/libs/busbus.jar
+web: java $JAVA_OPTS -jar backend/build/libs/busbus.jar
