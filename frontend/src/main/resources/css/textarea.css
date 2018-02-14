@@ -1,0 +1,15 @@
+textarea {
+    background-color: white;
+    color: black;
+    border: 2px solid #e7e7e7;
+    padding: 8px 16px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    width: 20em;
+    height: 10em;
+    font-family: Verdana, serif;
+    resize: none;
+}

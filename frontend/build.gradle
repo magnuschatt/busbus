@@ -1,0 +1,73 @@
+plugins {
+    id "com.eriwen.gradle.js" version "2.14.1"
+    id "com.eriwen.gradle.css" version "2.14.0"
+}
+
+apply plugin: 'kotlin2js'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+    compile "org.jetbrains.kotlinx:kotlinx-html-js:$kotlinx_html_version"
+}
+
+ext.jsDir = "$project.buildDir.path/js"
+ext.cssDir = "$project.buildDir.path/resources/main/css"
+ext.webDir = "${project(":backend").projectDir}/build/web"
+ext.webJsFile = "$webDir/${project.name}.js"
+ext.webCssFile = "$webDir/${project.name}.css"
+
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "$jsDir/${project.name}_main.js"
+    kotlinOptions.sourceMap = true
+}
+
+assemble.doLast {
+    file(webDir).mkdir()
+
+    configurations.compile.each { File file ->
+        copy {
+            includeEmptyDirs = false
+
+            from zipTree(file.absolutePath)
+            into "$jsDir/lib"
+            include { fileTreeElement ->
+                def path = fileTreeElement.path
+                path.endsWith(".js") && (path.startsWith("META-INF/resources/") || !path.startsWith("META-INF/"))
+            }
+        }
+    }
+
+    copy {
+        from "$project.buildDir.path/resources/main/html"
+        into webDir
+    }
+
+    minifyJs.run()
+    combineCss.run()
+    minifyCss.run()
+}
+
+minifyJs {
+    source = [fileTree("$jsDir/lib"), "$jsDir/${project.name}_main.js"]
+    dest = webJsFile
+    sourceMap = webJsFile + ".map"
+    closure {
+        warningLevel = 'QUIET'
+        compilerOptions.languageIn = "ECMASCRIPT5"
+        compilationLevel = 'WHITESPACE_ONLY'
+    }
+}
+
+combineCss {
+    source = cssDir
+    dest = webCssFile
+}
+
+minifyCss {
+    source = combineCss
+    dest = webCssFile
+    yuicompressor {
+        lineBreakPos = -1
+    }
+}
