@@ -1,4 +1,4 @@
-package chatt.busbus.frontend.busdata
+package chatt.busbus.frontend
 
 data class Prediction(val stopTitle: String,
                       val routeTag: String,

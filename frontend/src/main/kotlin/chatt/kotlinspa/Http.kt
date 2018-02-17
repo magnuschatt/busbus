@@ -1,4 +1,4 @@
-package chatt.busbus.frontend.framework
+package chatt.kotlinspa
 
 import org.w3c.xhr.XMLHttpRequest
 
@@ -66,12 +66,12 @@ object Http {
 
         fun put(url: String, payload: Any, then: (XMLHttpRequest) -> Unit = {}) {
             val json = JSON.stringify(payload)
-            Http.put(url, json, mimeType = "application/json", then = then)
+            put(url, json, mimeType = "application/json", then = then)
         }
 
         fun post(url: String, payload: Any, then: (XMLHttpRequest) -> Unit = {}) {
             val json = JSON.stringify(payload)
-            Http.post(url, json, mimeType = "application/json", then = then)
+            post(url, json, mimeType = "application/json", then = then)
         }
 
         fun <T> get(url: String, then: (T) -> Unit = {}) {

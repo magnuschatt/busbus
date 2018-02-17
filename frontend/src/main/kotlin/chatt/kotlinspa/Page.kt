@@ -1,4 +1,4 @@
-package chatt.busbus.frontend.framework
+package chatt.kotlinspa
 
 import org.w3c.dom.HTMLDivElement
 
