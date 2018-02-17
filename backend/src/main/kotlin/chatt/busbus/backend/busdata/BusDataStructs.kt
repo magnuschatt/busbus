@@ -1,4 +1,4 @@
-package chatt.busbus.backend.test
+package chatt.busbus.backend.busdata
 
 import org.bson.codecs.pojo.annotations.BsonId
 

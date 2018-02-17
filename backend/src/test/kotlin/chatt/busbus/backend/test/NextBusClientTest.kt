@@ -1,5 +1,6 @@
 package chatt.busbus.backend.test
 
+import chatt.busbus.backend.busdata.NextBusClient
 import org.junit.Assert.assertFalse
 import org.junit.Test
 

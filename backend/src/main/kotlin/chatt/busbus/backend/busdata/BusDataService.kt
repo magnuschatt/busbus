@@ -1,4 +1,4 @@
-package chatt.busbus.backend.test
+package chatt.busbus.backend.busdata
 
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters

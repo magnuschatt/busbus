@@ -1,6 +1,6 @@
 package chatt.busbus.backend
 
-import chatt.busbus.backend.test.BusDataService
+import chatt.busbus.backend.busdata.BusDataService
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -17,8 +17,6 @@ import io.ktor.routing.get
 @Suppress("unused")
 fun Application.main() {
 
-    val busDataService = BusDataService()
-
     install(StatusPages) {
         exception<ParameterException> {
             call.respond(HttpStatusCode.BadRequest, it.msg)
@@ -32,6 +30,9 @@ fun Application.main() {
     install(CallLogging)
     install(Routing) {
 
+        val busDataService = BusDataService()
+
+        // expose endpoint for fetching departure predictions near given coordinate
         get("backend/predictions") {
             val latitude = call.parameters["lat"]?.toDoubleOrNull()
             val longitude = call.parameters["lon"]?.toDoubleOrNull()
