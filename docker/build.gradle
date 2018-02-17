@@ -1,0 +1,22 @@
+
+def groupName = 'docker'
+
+def mongoDir = 'mongo'
+def mongoImage = 'busbus-mongo'
+def mongoContainer = 'busbus-mongo'
+
+task mongoBuildImage(type: Exec) {
+    group groupName
+    commandLine 'docker', 'build',  '-t', mongoImage, mongoDir
+}
+
+task mongoRemoveContainer(type: Exec) {
+    group groupName
+    commandLine 'docker', 'rm', '-f', mongoContainer
+    ignoreExitValue = true
+}
+
+task mongoRunContainer(type: Exec) {
+    group groupName
+    commandLine 'docker', 'run', '--name', mongoContainer, '-d', '-p', '27017:27017', mongoImage
+}

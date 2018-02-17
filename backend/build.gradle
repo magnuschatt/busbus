@@ -7,7 +7,11 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
+    compile "io.ktor:ktor-jackson:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
+    compile "org.litote.kmongo:kmongo:$kmongo_version"
+    compile "com.github.jkcclemens:khttp:$khttp_version"
+    compile "org.json:json:$orgjson_version"
 }
 
 compileKotlin {

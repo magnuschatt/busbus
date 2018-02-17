@@ -4,6 +4,9 @@ buildscript {
     ext.logback_version = '1.2.3'
     ext.shadow_version = '2.0.2'
     ext.kotlinx_html_version = '0.6.8'
+    ext.kmongo_version = '3.6.1'
+    ext.khttp_version = '0.1.0'
+    ext.orgjson_version = '20180130'
 
     repositories {
         mavenCentral()
@@ -25,6 +28,7 @@ allprojects {
     repositories {
         jcenter()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
         maven { url "http://dl.bintray.com/kotlin/ktor" }
         maven { url "https://dl.bintray.com/kotlin/kotlinx" }
     }
