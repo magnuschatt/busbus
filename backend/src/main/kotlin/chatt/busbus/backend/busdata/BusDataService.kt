@@ -15,7 +15,7 @@ class BusDataService(forceLoadBusData: Boolean = false) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val mongoUri: MongoClientURI = MongoClientURI(System.getenv("MONGODB_URI"))
-    private val database: MongoDatabase = KMongo.createClient(mongoUri).getDatabase("busbus")
+    private val database: MongoDatabase = KMongo.createClient(mongoUri).getDatabase(mongoUri.database)
     private val nextBusClient = NextBusClient()
     private val agencyColl = database.getCollection<Agency>()
     private val routeColl = database.getCollection<Route>()
