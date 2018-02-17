@@ -35,6 +35,6 @@ allprojects {
     }
 }
 
-task stage(dependsOn: ['frontend:build', 'backend:build', 'frontend:clearn', 'backend:clean'])
+task stage(dependsOn: ['frontend:build', 'backend:build', 'frontend:clean', 'backend:clean'])
 tasks.findByPath('frontend:build').mustRunAfter(tasks.findByPath('frontend:clean'))
 tasks.findByPath('backend:build').mustRunAfter(tasks.findByPath('backend:clean'))
