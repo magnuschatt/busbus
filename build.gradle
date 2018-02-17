@@ -7,6 +7,7 @@ buildscript {
     ext.kmongo_version = '3.6.1'
     ext.khttp_version = '0.1.0'
     ext.orgjson_version = '20180130'
+    ext.junit_version = '4.12'
 
     repositories {
         mavenCentral()

@@ -1,4 +1,4 @@
-package chatt.busbus.backend
+package chatt.busbus.backend.test
 
 import org.bson.codecs.pojo.annotations.BsonId
 
@@ -16,7 +16,7 @@ data class Stop(val tag: String,
                 val title: String,
                 val location: GeoLocation) {
     @BsonId
-    val mongoId: String = "$routeTag|$tag"
+    val id: String = "$routeTag|$tag"
 }
 
 data class Prediction(val stopTitle: String,
