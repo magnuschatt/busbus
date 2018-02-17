@@ -25,6 +25,7 @@ data class Prediction(val stopTitle: String,
                       val seconds: List<Int>)
 
 @Suppress("unused") // Used by MongoDB
-class GeoLocation(val latitude: Double, val longitude: Double) {
+class GeoLocation(latitude: Double, longitude: Double) {
     val type = "Point"
+    val coordinates = listOf(longitude, latitude)
 }

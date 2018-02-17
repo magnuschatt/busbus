@@ -50,7 +50,7 @@ fun initDatabase() {
     val agencyColl = database.getCollection<Agency>().apply { drop() }
     val routeColl = database.getCollection<Route>().apply { drop() }
     val stopColl = database.getCollection<Stop>().apply { drop() }
-    stopColl.createIndex(Indexes.geo2dsphere("location.position"))
+    stopColl.createIndex(Indexes.geo2dsphere("location"))
 
     val agencies = nextBusClient.getAgencies()
     val sfMuni = agencies.first { it.tag == "sf-muni" }
