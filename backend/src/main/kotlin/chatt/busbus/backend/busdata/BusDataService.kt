@@ -1,5 +1,6 @@
 package chatt.busbus.backend.busdata
 
+import com.mongodb.MongoClientURI
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Indexes
@@ -13,7 +14,8 @@ import org.slf4j.LoggerFactory
 class BusDataService(forceLoadBusData: Boolean = false) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val database: MongoDatabase = KMongo.createClient(System.getenv("MONGODB_URI")).getDatabase("busbus")
+    private val mongoUri: MongoClientURI = MongoClientURI(System.getenv("MONGODB_URI"))
+    private val database: MongoDatabase = KMongo.createClient(mongoUri).getDatabase("busbus")
     private val nextBusClient = NextBusClient()
     private val agencyColl = database.getCollection<Agency>()
     private val routeColl = database.getCollection<Route>()
