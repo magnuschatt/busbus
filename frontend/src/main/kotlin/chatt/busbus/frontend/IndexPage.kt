@@ -92,7 +92,6 @@ fun updateDepartureTime(timeElement: HTMLElement, departureTimes: List<Int>, pag
         if (next > 0) break
     }
 
-
     val hours = next / 3600
     val minutes = (next % 3600) / 60
     val seconds = next % 60
