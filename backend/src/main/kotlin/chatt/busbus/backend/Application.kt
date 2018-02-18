@@ -7,6 +7,8 @@ import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.content.file
+import io.ktor.content.files
+import io.ktor.content.static
 import io.ktor.features.CallLogging
 import io.ktor.features.ContentNegotiation
 import io.ktor.features.StatusPages
@@ -53,12 +55,10 @@ fun Application.main() {
         }
 
         // serve frontend as a single-page-app
-        val webDir = "build/web"
-        file("frontend.css", "$webDir/frontend.css")
-        file("frontend.js", "$webDir/frontend.js")
-        file("frontend.js.map", "$webDir/frontend.js.map")
-        file("{...}", "$webDir/frontend.html")
 
+        val webDir = "build/web"
+        static("web") { files(webDir) }
+        file("{...}", "$webDir/frontend.html")
     }
 
 }

@@ -1,5 +1,4 @@
 plugins {
-    id "com.eriwen.gradle.js" version "2.14.1"
     id "com.eriwen.gradle.css" version "2.14.0"
 }
 
@@ -47,24 +46,17 @@ assemble.doLast {
         into webDir
     }
 
-    minifyJs.run()
+    copy {
+        from jsDir
+        into webDir
+    }
+
     combineCss.run()
     minifyCss.run()
 
     copy {
         from webDir
         into herokuWebDir
-    }
-}
-
-minifyJs {
-    source = ["$jsDir/kotlin.js", fileTree("$jsDir/lib"), "$jsDir/${project.name}_main.js"]
-    dest = webJsFile
-    sourceMap = webJsFile + ".map"
-    closure {
-        warningLevel = 'QUIET'
-        compilerOptions.languageIn = "ECMASCRIPT5"
-        compilationLevel = 'SIMPLE_OPTIMIZATIONS'
     }
 }
 
