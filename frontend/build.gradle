@@ -64,7 +64,7 @@ minifyJs {
     closure {
         warningLevel = 'QUIET'
         compilerOptions.languageIn = "ECMASCRIPT5"
-        compilationLevel = 'WHITESPACE_ONLY'
+        compilationLevel = 'SIMPLE_OPTIMIZATIONS'
     }
 }
 

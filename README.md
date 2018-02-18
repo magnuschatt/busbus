@@ -4,4 +4,5 @@
 This web app shows bus departures near you in San Francisco.
 To see a live version please go to: https://busbus.herokuapp.com/
 
-It's structured in
+It's structured in a frontend and a backend.
+The backend is connected to a MongoDB.
