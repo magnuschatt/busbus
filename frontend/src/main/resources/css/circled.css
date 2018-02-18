@@ -1,0 +1,11 @@
+.circled {
+    border-radius: 20%;
+    behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+
+    color: DarkGoldenRod;
+    background: #fff;
+    border: 2px solid;
+    text-align: center;
+    font-weight: bold;
+    padding: 2px;
+}

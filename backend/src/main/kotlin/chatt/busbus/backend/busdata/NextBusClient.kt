@@ -112,11 +112,13 @@ class NextBusClient {
             val routeTag = prediction.string("routeTag")
             val routeTitle = prediction.string("routeTitle")
 
-            prediction.array("direction").forEach { direction ->
+            val directions = prediction.array("direction").map { direction ->
                 val directionTitle = direction.string("title")
                 val seconds = direction.array("prediction").map { it.int("seconds") }
-                result.add(BusPrediction(stopTitle, routeTag, routeTitle, directionTitle, seconds))
+                BusPrediction.Direction(directionTitle, seconds)
             }
+
+            result.add(BusPrediction(stopTitle, routeTag, routeTitle, directions))
         }
 
         return result
