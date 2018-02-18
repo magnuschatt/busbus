@@ -34,7 +34,7 @@ assemble.doLast {
             includeEmptyDirs = false
 
             from zipTree(file.absolutePath)
-            into "$jsDir/lib"
+            into "$jsDir"
             include { fileTreeElement ->
                 def path = fileTreeElement.path
                 path.endsWith(".js") && (path.startsWith("META-INF/resources/") || !path.startsWith("META-INF/"))
@@ -58,7 +58,7 @@ assemble.doLast {
 }
 
 minifyJs {
-    source = [fileTree("$jsDir/lib"), "$jsDir/${project.name}_main.js"]
+    source = ["$jsDir/kotlin.js", fileTree("$jsDir/lib"), "$jsDir/${project.name}_main.js"]
     dest = webJsFile
     sourceMap = webJsFile + ".map"
     closure {
