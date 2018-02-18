@@ -24,13 +24,4 @@ class BusDataServiceTest {
         assertFalse(predictions.isEmpty())
     }
 
-    @Test
-    fun `test for no duplicate predictions`() {
-        val stops = busDataService.getStopsNearby(latitude, longitude, distance, 1000)
-        assertFalse(stops.isEmpty())
-
-        val predictions = busDataService.getPredictions(stops)
-        assertFalse(predictions.isEmpty())
-    }
-
 }

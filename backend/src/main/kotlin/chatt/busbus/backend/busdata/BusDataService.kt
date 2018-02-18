@@ -1,16 +1,20 @@
 package chatt.busbus.backend.busdata
 
-import chatt.busbus.backend.mongo.MongoDatabase
+import chatt.busbus.backend.mongo.MongoBusDatabase
 import chatt.busbus.common.BusPrediction
 import chatt.busbus.common.BusStop
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+/**
+ * Responsible for all bus data jobs.
+ * Delegates tasks to BusDatabase.kt and NextBusClient.kt depending on what is needed.
+ */
 class BusDataService(forceLoadBusData: Boolean = false) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val nextBusClient = NextBusClient()
-    private val database: BusDatabase = MongoDatabase()
+    private val database: BusDatabase = MongoBusDatabase()
 
     init {
         if (forceLoadBusData || database.isEmpty()) {

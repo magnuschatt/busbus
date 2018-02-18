@@ -6,6 +6,10 @@ import kotlin.math.*
 
 object GeoLocation {
 
+    /**
+     * Registers the current geo position of the user.
+     * Runs supplied function when it is found.
+     */
     fun getCurrentPosition(then: (Position) -> Unit) {
         window.navigator.asDynamic().geolocation.getCurrentPosition { pos ->
             val latitude = (pos.coords.latitude as Double)
@@ -15,8 +19,9 @@ object GeoLocation {
     }
 
     /**
-     * Calculates distance in meters between two geo positions (lat, lon).
-     * Grabbed here: https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
+     * Calculates distance in meters between two geo positions.
+     * Grabbed from:
+     * https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula
      */
     fun distance(pos1: Position, pos2: Position): Double {
         val lat1 = pos1.latitude

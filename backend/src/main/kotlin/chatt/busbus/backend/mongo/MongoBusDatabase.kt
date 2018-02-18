@@ -13,7 +13,10 @@ import com.mongodb.client.model.geojson.Point
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollection
 
-class MongoDatabase : BusDatabase {
+/**
+ * Mongo implementation of the BusDatabase interface.
+ */
+class MongoBusDatabase : BusDatabase {
 
     private val mongoUri: MongoClientURI = MongoClientURI(System.getenv("MONGODB_URI"))
     private val database: MongoDatabase = KMongo.createClient(mongoUri).getDatabase(mongoUri.database)

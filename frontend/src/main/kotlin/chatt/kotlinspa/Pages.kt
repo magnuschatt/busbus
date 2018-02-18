@@ -11,7 +11,7 @@ import kotlin.browser.window
 
 object Pages {
 
-    val registeredUrls: Set<String>
+    private val registeredUrls: Set<String>
         get() = map.keys
 
     private val currentPath: String
@@ -30,25 +30,9 @@ object Pages {
         window.onpopstate = { renderCurrent() }
     }
 
-    private fun String.fixed() = this
-            .substringAfter("://")
-            .substringAfter("/")
-            .substringBefore("?")
-
-    private fun Map<String, String>.toQueryString(): String {
-        return if (isEmpty()) ""
-        else "?" + entries.joinToString { (key, value) -> "$key=$value" }
-    }
-
     fun register(page: Page) {
         validatePageUrl(page.url)
         map[page.url.fixed()] = page.builder
-    }
-
-    private fun validatePageUrl(url: String) {
-        if (url.contains('?')) throw IllegalArgumentException("Query component not allowed in url: $url")
-        if (!url.startsWith("/")) throw IllegalArgumentException("URL must start with a '/', but was '$url'")
-        if (url in registeredUrls) throw IllegalStateException("URL registered twice: '$url'")
     }
 
     fun switchTo(page: Page, queryParams: Map<String, String> = emptyMap()) {
@@ -64,6 +48,22 @@ object Pages {
             currentDiv?.let { cd -> cd .parentNode?.removeChild(cd) }
             Html.body().appendChild(it)
         }
+    }
+
+    private fun validatePageUrl(url: String) {
+        if (url.contains('?')) throw IllegalArgumentException("Query component not allowed in url: $url")
+        if (!url.startsWith("/")) throw IllegalArgumentException("URL must start with a '/', but was '$url'")
+        if (url in registeredUrls) throw IllegalStateException("URL registered twice: '$url'")
+    }
+
+    private fun String.fixed() = this
+            .substringAfter("://")
+            .substringAfter("/")
+            .substringBefore("?")
+
+    private fun Map<String, String>.toQueryString(): String {
+        return if (isEmpty()) ""
+        else "?" + entries.joinToString { (key, value) -> "$key=$value" }
     }
 
 }

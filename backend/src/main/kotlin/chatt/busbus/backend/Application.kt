@@ -55,7 +55,6 @@ fun Application.main() {
         }
 
         // serve frontend as a single-page-app
-
         val webDir = "build/web"
         static("web") { files(webDir) }
         file("{...}", "$webDir/frontend.html")

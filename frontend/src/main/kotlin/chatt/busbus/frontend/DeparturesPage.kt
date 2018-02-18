@@ -12,7 +12,7 @@ import kotlin.browser.window
 import kotlin.js.Date
 import kotlin.math.roundToInt
 
-val index: Page = Page.create("/") {
+val departuresPage: Page = Page.create("/") {
     append {
         h1 {
             +"Bus Departures Near You"

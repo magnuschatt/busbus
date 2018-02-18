@@ -1,3 +1,5 @@
 .away {
     float: right;
+    color: grey;
+    font-weight: plain;
 }
