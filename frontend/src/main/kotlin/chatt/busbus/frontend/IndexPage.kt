@@ -25,13 +25,22 @@ val index: Page = Page.create("/") {
                 val stops: Map<String, BusStop> = departureInfo.stops.associateBy { it.title }
 
                 // group predictions by stop (throw exc if stop is missing)
-                // and sort entries by distance away from user
-                // and finally append HTML info box to parent div
+                // sort entries by distance from user
+                // finally for each stop: append HTML info box
                 departureInfo.predictions
                         .groupBy { stops[it.stopTitle]!! }
                         .map { Pair(it.key, it.value) }
                         .sortedBy { (stop, _) -> GeoLocation.distance(stop.position, userPosition)}
                         .forEach { (stop, predictions) -> appendStopInfoBox(stop, predictions, userPosition) }
+
+                // show info if no predictions were found.
+                if (departureInfo.predictions.isEmpty()) {
+                    val manualGeoLink = "https://chrome.google.com/webstore/detail/manual-geolocation/jpiefjlgcjmciajdcinaejedejjfjgki"
+                    p { +"No departures found near you." }
+                    p { +"Departures are only shown when you are in San Francisco."}
+                    p { +"If you want to test this app consider downloading chrome extension:" }
+                    p { a(manualGeoLink) { +"Manual Geolocation" } }
+                }
             }
         }
     }
