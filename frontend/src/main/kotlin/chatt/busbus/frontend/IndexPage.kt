@@ -49,7 +49,7 @@ val index: Page = Page.create("/") {
 fun TagConsumer<HTMLElement>.appendStopInfoBox(stop: BusStop,
                                                predictions: List<BusPrediction>,
                                                userPosition: Position) {
-    div(classes = "stopbox") {
+    div(classes = "stopInfoBox") {
 
         h3 {
             val mapsLink = "https://www.google.com/maps/?q=${stop.position.latitude},${stop.position.longitude}"
