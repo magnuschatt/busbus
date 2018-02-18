@@ -2,4 +2,5 @@ rootProject.name = 'busbus'
 include 'backend'
 include 'frontend'
 include 'docker'
+include 'common'
 

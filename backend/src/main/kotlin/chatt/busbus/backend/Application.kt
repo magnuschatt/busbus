@@ -1,6 +1,8 @@
 package chatt.busbus.backend
 
 import chatt.busbus.backend.busdata.BusDataService
+import chatt.busbus.common.BackendUrls
+import chatt.busbus.common.BusDepartureInfo
 import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.application.install
@@ -16,6 +18,8 @@ import io.ktor.routing.get
 
 @Suppress("unused")
 fun Application.main() {
+
+    class ParameterException(val msg: String) : Exception(msg)
 
     install(StatusPages) {
         exception<ParameterException> {
@@ -33,7 +37,7 @@ fun Application.main() {
         val busDataService = BusDataService()
 
         // expose endpoint for fetching departure predictions near given coordinate
-        get("backend/predictions") {
+        get(BackendUrls.departures) {
             val latitude = call.parameters["lat"]?.toDoubleOrNull()
             val longitude = call.parameters["lon"]?.toDoubleOrNull()
             val distance = call.parameters["dist"]?.toDoubleOrNull()
@@ -42,10 +46,10 @@ fun Application.main() {
                 throw ParameterException("Call must contain numeric parameters: lat, lon, dist")
             }
 
-            val stops = busDataService.getStopsNearby(latitude, longitude, distance)
+            val stops = busDataService.getStopsNearby(latitude, longitude, distance, 100)
             val predictions = busDataService.getPredictions(stops)
-            val response = mapOf("stops" to stops, "predictions" to predictions)
-            call.respond(response)
+            val departureInfo = BusDepartureInfo(stops, predictions)
+            call.respond(departureInfo)
         }
 
         // serve frontend as a single-page-app

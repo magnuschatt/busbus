@@ -2,7 +2,6 @@ package chatt.kotlinspa
 
 import org.w3c.xhr.XMLHttpRequest
 
-
 object Http {
 
     enum class ReadyState(val value: Short) {
@@ -60,28 +59,6 @@ object Http {
         }
 
         req.send()
-    }
-
-    object Json {
-
-        fun put(url: String, payload: Any, then: (XMLHttpRequest) -> Unit = {}) {
-            val json = JSON.stringify(payload)
-            put(url, json, mimeType = "application/json", then = then)
-        }
-
-        fun post(url: String, payload: Any, then: (XMLHttpRequest) -> Unit = {}) {
-            val json = JSON.stringify(payload)
-            post(url, json, mimeType = "application/json", then = then)
-        }
-
-        fun <T> get(url: String, then: (T) -> Unit = {}) {
-            Http.get(url) { req ->
-                then(JSON.parse(req.responseText))
-            }
-        }
-
-        fun delete(url: String, then: (XMLHttpRequest) -> Unit) = Http.delete(url, then)
-
     }
 
 

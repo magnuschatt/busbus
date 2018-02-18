@@ -22,7 +22,7 @@ object Pages {
     private val pageNotFound: HTMLDivElement.() -> Unit = {
         append {
             h1 { +"404" }
-            h3 { +"Page not found: ${currentPath}" }
+            h3 { +"Page not found: $currentPath" }
         }
     }
 

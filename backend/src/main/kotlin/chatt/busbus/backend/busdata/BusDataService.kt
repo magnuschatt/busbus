@@ -1,28 +1,19 @@
 package chatt.busbus.backend.busdata
 
-import com.mongodb.MongoClientURI
-import com.mongodb.client.MongoDatabase
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Indexes
-import com.mongodb.client.model.geojson.Point
-import com.mongodb.client.model.geojson.Position
-import org.litote.kmongo.KMongo
-import org.litote.kmongo.getCollection
+import chatt.busbus.backend.mongo.MongoDatabase
+import chatt.busbus.common.BusPrediction
+import chatt.busbus.common.BusStop
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class BusDataService(forceLoadBusData: Boolean = false) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
-    private val mongoUri: MongoClientURI = MongoClientURI(System.getenv("MONGODB_URI"))
-    private val database: MongoDatabase = KMongo.createClient(mongoUri).getDatabase(mongoUri.database)
     private val nextBusClient = NextBusClient()
-    private val agencyColl = database.getCollection<Agency>()
-    private val routeColl = database.getCollection<Route>()
-    private val stopColl = database.getCollection<Stop>()
+    private val database: BusDatabase = MongoDatabase()
 
     init {
-        if (forceLoadBusData || stopColl.count() == 0L) {
+        if (forceLoadBusData || database.isEmpty()) {
             loadBusData()
         }
     }
@@ -30,35 +21,25 @@ class BusDataService(forceLoadBusData: Boolean = false) {
     private fun loadBusData() {
         logger.info("Loading bus data")
 
-        agencyColl.drop()
-        routeColl.drop()
-        stopColl.drop()
-        stopColl.createIndex(Indexes.geo2dsphere("location"))
-
-        // Loading agencies
         val agencies = nextBusClient.getAgencies()
         val sfMuni = agencies.first { it.tag == "sf-muni" }
         logger.info("Inserting ${agencies.size} agencies")
-        agencyColl.insertMany(agencies)
+        database.insertAgencies(agencies)
 
-        // Loading routes
         val routes = nextBusClient.getRoutes(sfMuni)
         logger.info("Inserting ${routes.size} routes")
-        routeColl.insertMany(routes)
+        database.insertRoutes(routes)
 
-        // Loading stops
         val stops = nextBusClient.getStops(sfMuni)
         logger.info("Inserting ${stops.size} stops")
-        stopColl.insertMany(stops)
+        database.insertStops(stops)
     }
 
-    fun getStopsNearby(latitude: Double, longitude: Double, maxDistance: Double, limit: Int = 10): List<Stop> {
-        val point = Point(Position(longitude, latitude)) // lat & lon is flipped in Mongo!
-        val filter = Filters.near("location", point, maxDistance, 0.0)
-        return stopColl.find(filter).limit(limit).toList()
+    fun getStopsNearby(latitude: Double, longitude: Double, maxDistance: Double, limit: Int = 10): List<BusStop> {
+        return database.findNearbyStops(latitude, longitude, maxDistance, limit)
     }
 
-    fun getPredictions(stops: List<Stop>): List<Prediction> {
+    fun getPredictions(stops: List<BusStop>): List<BusPrediction> {
         return nextBusClient.getPredictions(stops)
     }
 

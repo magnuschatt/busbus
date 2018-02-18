@@ -1,18 +1,19 @@
 
-apply plugin: 'kotlin'
+apply plugin: 'kotlin-platform-jvm'
 apply plugin: 'application'
 apply plugin: "com.github.johnrengelman.shadow"
 
 dependencies {
+    expectedBy project(':common')
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "io.ktor:ktor-server-core:$ktor_version"
     compile "io.ktor:ktor-server-netty:$ktor_version"
     compile "io.ktor:ktor-jackson:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
-
     compile "org.litote.kmongo:kmongo:$kmongo_version"
     compile "com.github.jkcclemens:khttp:$khttp_version"
     compile "org.json:json:$orgjson_version"
+    compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
 
     testCompile "junit:junit:4.12"
 }

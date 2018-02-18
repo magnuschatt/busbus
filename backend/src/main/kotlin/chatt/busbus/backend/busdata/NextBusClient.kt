@@ -1,7 +1,12 @@
 package chatt.busbus.backend.busdata
 
+import chatt.busbus.common.BusAgency
+import chatt.busbus.common.BusPrediction
+import chatt.busbus.common.BusRoute
+import chatt.busbus.common.BusStop
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
@@ -9,8 +14,8 @@ import org.json.XML
 import java.net.URL
 
 /**
- * Responsible for fetching raw data from the NextBusXMLFeed REST interface.
- * Converts the XML responses to POJOs containing only relevant data.
+ * Responsible for fetching raw data from the NextBusXMLFeed REST interface and for
+ * converting it to our local data model (POJOs) containing only relevant data.
  */
 class NextBusClient {
 
@@ -19,57 +24,70 @@ class NextBusClient {
     private val routeListUrl = baseCommandUrl + "routeList&a=%s"
     private val routeConfigUrl = baseCommandUrl + "routeConfig&a=%s&r=%s&terse"
     private val predictionsUrl = baseCommandUrl + "predictionsForMultiStops&a=%s"
-    private val jsonMapper = ObjectMapper()
+    private val jsonMapper = ObjectMapper().apply { registerKotlinModule() }
 
-    fun getAgencies(): List<Agency> {
+    fun getAgencies(): List<BusAgency> {
         val json = readFromUrl(agencyListUrl)
         val array = json.node("body").node("agency")
         return array.map {
-            Agency(it.string("tag"), it.string("title"), it.string("regionTitle"))
+            BusAgency(
+                    tag = it.string("tag"),
+                    title = it.string("title")
+            )
         }
     }
 
-    fun getRoutes(agency: Agency): List<Route> {
+    fun getRoutes(agency: BusAgency): List<BusRoute> {
         val url = String.format(routeListUrl, agency.tag)
         val json = readFromUrl(url)
         val array = json.node("body").node("route")
         return array.map {
-            Route(it.string("tag"), agency.tag, it.string("title"))
+            BusRoute(
+                    tag = it.string("tag"),
+                    agencyTag = agency.tag,
+                    title = it.string("title")
+            )
         }
     }
 
-    fun getStops(route: Route): List<Stop> {
+    fun getStops(route: BusRoute): List<BusStop> {
         val url = String.format(routeConfigUrl, route.agencyTag, route.tag)
         val json = readFromUrl(url)
         val array = json.node("body").node("route").node("stop")
         return array.map {
-            val location = GeoLocation(it.double("lat"), it.double("lon"))
-            Stop(it.string("tag"), route.agencyTag, route.tag, it.string("title"), location)
+            BusStop(
+                    tag = it.string("tag"),
+                    title = it.string("title"),
+                    agencyTag = route.agencyTag,
+                    routeTag = route.tag,
+                    latitude = it.double("lat"),
+                    longitude = it.double("lon")
+            )
         }
     }
 
-    fun getStops(routes: List<Route>): List<Stop> = runBlocking {
+    fun getStops(agency: BusAgency): List<BusStop> {
+        return getStops(getRoutes(agency))
+    }
+
+    fun getStops(routes: List<BusRoute>): List<BusStop> = runBlocking {
         return@runBlocking routes
                 .map { route -> async { getStops(route) } }
                 .flatMap { it.await() }
     }
 
-    fun getStops(agency: Agency): List<Stop> {
-        return getStops(getRoutes(agency))
-    }
-
-    fun getPredictions(stopList: List<Stop>): List<Prediction> = runBlocking {
-        val result = mutableListOf<Deferred<List<Prediction>>>()
+    fun getPredictions(stopList: List<BusStop>): List<BusPrediction> = runBlocking {
+        val result = mutableListOf<Deferred<List<BusPrediction>>>()
 
         // grouping stops by agency to be able to correctly call NextBusXMLFeed
-        stopList.groupBy(Stop::agencyTag).forEach { agencyTag, stops_ ->
+        stopList.groupBy(BusStop::agencyTag).forEach { agencyTag, stops ->
 
             // up to 150 stops per call to predictionsForMultiStops is allowed
-            stops_.chunked(150).forEach { stops ->
+            stops.chunked(150).forEach { stops150 ->
 
                 // starting jobs asynchronously and adding them to result list
                 val predictions = async {
-                    val stopsString = stops.joinToString("") { "&stops=${it.routeTag}|${it.tag}" }
+                    val stopsString = stops150.joinToString("") { "&stops=${it.routeTag}|${it.tag}" }
                     val url = String.format(predictionsUrl, agencyTag) + stopsString
                     val json = readFromUrl(url)
                     return@async extractPredictions(json)
@@ -83,18 +101,19 @@ class NextBusClient {
         return@runBlocking result.flatMap { it.await() }
     }
 
-    private fun extractPredictions(json: JsonNode): List<Prediction> {
-        val result = mutableListOf<Prediction>()
+    private fun extractPredictions(json: JsonNode): List<BusPrediction> {
+        val result = mutableListOf<BusPrediction>()
 
         val array = json.node("body").array("predictions")
         array.filter { it.has("direction") }.forEach { prediction ->
             val stopTitle = prediction.string("stopTitle")
             val routeTag = prediction.string("routeTag")
+            val routeTitle = prediction.string("routeTitle")
 
             prediction.array("direction").forEach { direction ->
-                val dirTitle = direction.string("title")
+                val directionTitle = direction.string("title")
                 val seconds = direction.array("prediction").map { it.int("seconds") }
-                result.add(Prediction(stopTitle, routeTag, dirTitle, seconds))
+                result.add(BusPrediction(stopTitle, routeTag, routeTitle, directionTitle, seconds))
             }
         }
 
