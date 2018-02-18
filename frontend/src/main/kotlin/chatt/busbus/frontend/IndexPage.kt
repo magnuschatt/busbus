@@ -5,23 +5,28 @@ import chatt.busbus.common.BusDepartureInfo
 import chatt.kotlinspa.Http
 import chatt.kotlinspa.Page
 import kotlinx.html.dom.append
+import kotlinx.html.js.b
+import kotlinx.html.js.div
 import kotlinx.html.js.h1
+import kotlinx.html.js.p
 import kotlinx.serialization.json.JSON
 
 val index: Page = Page.create("/") {
     append {
         h1 {
-            +"Bus Departures Near You"
+            +"Departures Near You"
         }
 
         GeoLocation.getCurrentPosition { pos ->
-            println(pos)
             Http.get(BackendUrls.departuresNearby(pos.latitude, pos.longitude, 1000.0)) {
-                val predictionList = JSON.parse<BusDepartureInfo>(it.responseText)
-                println(predictionList)
+                val departureInfo = JSON.parse<BusDepartureInfo>(it.responseText)
+                departureInfo.predictions.groupBy { it.stopTitle }.forEach { (stopTitle, _) ->
+                    div(classes = "whitebox") {
+                        p { b { +stopTitle } }
+                    }
+                }
             }
         }
-
     }
 
 }
