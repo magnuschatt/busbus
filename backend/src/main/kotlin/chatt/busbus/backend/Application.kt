@@ -37,7 +37,7 @@ fun Application.main() {
         val busDataService = BusDataService()
 
         // expose endpoint for fetching departure predictions near given coordinate
-        get(BackendUrls.departures) {
+        get(BackendUrls.departuresNearby) {
             val latitude = call.parameters["lat"]?.toDoubleOrNull()
             val longitude = call.parameters["lon"]?.toDoubleOrNull()
             val distance = call.parameters["dist"]?.toDoubleOrNull()

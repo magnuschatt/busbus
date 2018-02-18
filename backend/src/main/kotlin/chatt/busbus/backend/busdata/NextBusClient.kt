@@ -37,6 +37,12 @@ class NextBusClient {
         }
     }
 
+    fun getRoutes(agencies: List<BusAgency>) = runBlocking {
+        return@runBlocking agencies
+                .map { route -> async { getRoutes(route) } }
+                .flatMap { it.await() }
+    }
+
     fun getRoutes(agency: BusAgency): List<BusRoute> {
         val url = String.format(routeListUrl, agency.tag)
         val json = readFromUrl(url)

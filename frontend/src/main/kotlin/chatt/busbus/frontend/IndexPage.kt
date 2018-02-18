@@ -22,7 +22,7 @@ val index: Page = Page.create("/") {
             +"Index"
         }
 
-        Http.get(BackendUrls.departures(37.80296, -122.40103, 100000.0)) {
+        Http.get(BackendUrls.departuresNearby(37.80296, -122.40103, 100000.0)) {
             val predictionList = JSON.parse<BusDepartureInfo>(it.responseText)
             println(predictionList)
         }

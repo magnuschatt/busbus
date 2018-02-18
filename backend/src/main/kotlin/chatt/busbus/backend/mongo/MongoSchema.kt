@@ -28,8 +28,8 @@ object MongoSchema {
         val type = "Point"
         val coordinates = listOf(longitude, latitude) // lat & lon is flipped in Mongo!
 
-        fun getLatitude() = coordinates[1]
-        fun getLongitude() = coordinates[0]
+        fun latitude() = coordinates[1]
+        fun longitude() = coordinates[0]
     }
 
 }

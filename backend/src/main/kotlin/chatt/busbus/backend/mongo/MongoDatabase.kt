@@ -82,8 +82,8 @@ class MongoDatabase : BusDatabase {
             title = title,
             agencyTag = agencyTag,
             routeTag = routeTag,
-            latitude = location.getLatitude(),
-            longitude = location.getLongitude()
+            latitude = location.latitude(),
+            longitude = location.longitude()
     )
 
 

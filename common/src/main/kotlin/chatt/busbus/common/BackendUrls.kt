@@ -2,10 +2,10 @@ package chatt.busbus.common
 
 object BackendUrls {
 
-    const val departures = "backend/departures"
+    const val departuresNearby = "backend/departures/nearby"
 
-    fun departures(latitude: Double, longitude: Double, maxDistance: Double): String {
-        return "$departures?lat=$latitude&lon=$longitude&dist=$maxDistance"
+    fun departuresNearby(latitude: Double, longitude: Double, maxDistance: Double): String {
+        return "$departuresNearby?lat=$latitude&lon=$longitude&dist=$maxDistance"
     }
 
 }

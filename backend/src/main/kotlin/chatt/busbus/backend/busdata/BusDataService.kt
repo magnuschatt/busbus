@@ -6,7 +6,7 @@ import chatt.busbus.common.BusStop
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class BusDataService(forceLoadBusData: Boolean = false) {
+class BusDataService(forceLoadBusData: Boolean = true) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val nextBusClient = NextBusClient()
@@ -20,17 +20,18 @@ class BusDataService(forceLoadBusData: Boolean = false) {
 
     private fun loadBusData() {
         logger.info("Loading bus data")
+        database.init()
 
-        val agencies = nextBusClient.getAgencies()
-        val sfMuni = agencies.first { it.tag == "sf-muni" }
+        // for now we only want to work with sf-muni
+        val agencies = nextBusClient.getAgencies().filter { it.tag == "sf-muni" }
         logger.info("Inserting ${agencies.size} agencies")
         database.insertAgencies(agencies)
 
-        val routes = nextBusClient.getRoutes(sfMuni)
+        val routes = nextBusClient.getRoutes(agencies)
         logger.info("Inserting ${routes.size} routes")
         database.insertRoutes(routes)
 
-        val stops = nextBusClient.getStops(sfMuni)
+        val stops = nextBusClient.getStops(routes)
         logger.info("Inserting ${stops.size} stops")
         database.insertStops(stops)
     }
