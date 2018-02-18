@@ -7,5 +7,4 @@ data class BusStop(val tag: String,
                    val title: String,
                    val agencyTag: String,
                    val routeTag: String,
-                   val latitude: Double,
-                   val longitude: Double)
+                   val position: Position)

@@ -1,9 +1,6 @@
 package chatt.busbus.backend.busdata
 
-import chatt.busbus.common.BusAgency
-import chatt.busbus.common.BusPrediction
-import chatt.busbus.common.BusRoute
-import chatt.busbus.common.BusStop
+import chatt.busbus.common.*
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
@@ -66,8 +63,7 @@ class NextBusClient {
                     title = it.string("title"),
                     agencyTag = route.agencyTag,
                     routeTag = route.tag,
-                    latitude = it.double("lat"),
-                    longitude = it.double("lon")
+                    position = Position(it.double("lat"), it.double("lon"))
             )
         }
     }

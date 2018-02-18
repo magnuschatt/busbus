@@ -34,7 +34,7 @@ fun Application.main() {
     install(CallLogging)
     install(Routing) {
 
-        val busDataService = BusDataService()
+        val busDataService = BusDataService(forceLoadBusData = true)
 
         // expose endpoint for fetching departure predictions near given coordinate
         get(BackendUrls.departuresNearby) {

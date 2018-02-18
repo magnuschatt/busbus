@@ -4,12 +4,12 @@ import chatt.busbus.backend.busdata.BusDatabase
 import chatt.busbus.common.BusAgency
 import chatt.busbus.common.BusRoute
 import chatt.busbus.common.BusStop
+import chatt.busbus.common.Position
 import com.mongodb.MongoClientURI
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Indexes
 import com.mongodb.client.model.geojson.Point
-import com.mongodb.client.model.geojson.Position
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollection
 
@@ -20,12 +20,13 @@ class MongoDatabase : BusDatabase {
     private val agencyCollection = database.getCollection<MongoSchema.Agency>()
     private val routeCollection = database.getCollection<MongoSchema.Route>()
     private val stopCollection = database.getCollection<MongoSchema.Stop>()
+    private val positionFieldName = MongoSchema.Stop::position.name
 
     override fun init() {
         agencyCollection.drop()
         routeCollection.drop()
         stopCollection.drop()
-        stopCollection.createIndex(Indexes.geo2dsphere("location"))
+        stopCollection.createIndex(Indexes.geo2dsphere(positionFieldName))
     }
 
     override fun isEmpty(): Boolean {
@@ -48,8 +49,8 @@ class MongoDatabase : BusDatabase {
     }
 
     override fun findNearbyStops(latitude: Double, longitude: Double, maxDistance: Double, limit: Int): List<BusStop> {
-        val point = Point(Position(longitude, latitude)) // lat & lon is flipped in Mongo!
-        val filter = Filters.near("location", point, maxDistance, 0.0)
+        val point = Point(com.mongodb.client.model.geojson.Position(longitude, latitude)) // lat & lon is flipped in Mongo!
+        val filter = Filters.near(positionFieldName, point, maxDistance, 0.0)
         val stops = stopCollection.find(filter).limit(limit).toList()
         return stops.map { it.toCommon() }
     }
@@ -73,7 +74,7 @@ class MongoDatabase : BusDatabase {
             title = title,
             agencyTag = agencyTag,
             routeTag = routeTag,
-            location = MongoSchema.GeoLocation(latitude, longitude)
+            position = MongoSchema.Point(position.latitude, position.longitude)
     )
 
     // Mapper function: mongo -> common
@@ -82,8 +83,7 @@ class MongoDatabase : BusDatabase {
             title = title,
             agencyTag = agencyTag,
             routeTag = routeTag,
-            latitude = location.latitude(),
-            longitude = location.longitude()
+            position = Position(position.latitude(), position.longitude())
     )
 
 

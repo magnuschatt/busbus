@@ -18,7 +18,7 @@ class NextBusClientTest {
         val routes = nextBusClient.getRoutes(sfMuni)
         assertFalse(routes.isEmpty())
 
-        val stops = nextBusClient.getStops(routes.take(10))
+        val stops = nextBusClient.getStops(sfMuni)
         assertFalse(stops.isEmpty())
 
         val predictions = nextBusClient.getPredictions(stops.take(200))

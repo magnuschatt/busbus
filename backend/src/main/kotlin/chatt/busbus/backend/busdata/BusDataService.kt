@@ -6,7 +6,7 @@ import chatt.busbus.common.BusStop
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-class BusDataService(forceLoadBusData: Boolean = true) {
+class BusDataService(forceLoadBusData: Boolean = false) {
 
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
     private val nextBusClient = NextBusClient()

@@ -19,12 +19,12 @@ object MongoSchema {
                     val title: String,
                     val agencyTag: String,
                     val routeTag: String,
-                    val location: GeoLocation) {
+                    val position: Point) {
         @BsonId
         val id: String = "$agencyTag|$routeTag|$tag"
     }
 
-    class GeoLocation(latitude: Double, longitude: Double) {
+    class Point(latitude: Double, longitude: Double) {
         val type = "Point"
         val coordinates = listOf(longitude, latitude) // lat & lon is flipped in Mongo!
 
