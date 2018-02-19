@@ -1,6 +1,7 @@
 package chatt.busbus.frontend
 
 import chatt.busbus.common.*
+import chatt.kotlinspa.Html
 import chatt.kotlinspa.Http
 import chatt.kotlinspa.Page
 import kotlinx.html.TagConsumer
@@ -18,44 +19,61 @@ val departuresPage: Page = Page.create("/") {
             +"Bus Departures Near You"
         }
 
-        GeoLocation.getCurrentPosition { userPosition ->
+        val paramLatitude = Html.queryParams["lat"]?.toDoubleOrNull()
+        val paramLongitude = Html.queryParams["lon"]?.toDoubleOrNull()
 
-            val url = BackendUrls.departuresNearby(userPosition.latitude, userPosition.longitude, 1000.0)
-            Http.get(url) { req ->
-
-                val departureInfo = JSON.parse<BusDepartureInfo>(req.responseText)
-
-                // create map of stops with keys = title
-                val stops: Map<String, BusStop> = departureInfo.stops.associateBy { it.title }
-
-                // group predictions by stop (throw exc if stop is missing)
-                // sort entries by distance from user position
-                // finally for each stop: append HTML info box
-                departureInfo.predictions
-                        .groupBy { stops[it.stopTitle]!! }
-                        .map { Pair(it.key, it.value) }
-                        .sortedBy { (stop, _) -> GeoLocation.distance(stop.position, userPosition)}
-                        .forEach { (stop, predictions) -> appendStopInfoBox(stop, predictions, userPosition) }
-
-                // show info if no predictions were found.
-                if (departureInfo.predictions.isEmpty()) {
-                    val manualGeoLink = "https://chrome.google.com/webstore/detail/manual-geolocation/jpiefjlgcjmciajdcinaejedejjfjgki"
-                    p { +"No departures found near you." }
-                    p { +"Departures are only shown when you are in San Francisco."}
-                    p { +"If you want to test this app consider downloading chrome extension:" }
-                    p { a(manualGeoLink) { +"Manual Geolocation" } }
-                }
+        // If parameter latitude and longitude are given, use those instead
+        if (paramLatitude != null && paramLongitude != null) {
+            fetchAndAppendDepartureInfo(Position(paramLatitude, paramLongitude))
+        } else {
+            GeoLocation.getCurrentPosition { userPosition ->
+                fetchAndAppendDepartureInfo(userPosition)
             }
         }
     }
+}
+
+private fun TagConsumer<HTMLElement>.fetchAndAppendDepartureInfo(userPosition: Position) {
+
+    val url = BackendUrls.departuresNearby(userPosition.latitude, userPosition.longitude, 1000.0)
+    Http.get(url) { req ->
+
+        val departureInfo = JSON.parse<BusDepartureInfo>(req.responseText)
+
+        // create map of stops with keys = title
+        val stops: Map<String, BusStop> = departureInfo.stops.associateBy { it.title }
+
+        // group predictions by stop (throw exc if stop is missing)
+        // sort entries by distance from user position
+        // finally for each stop: append HTML info box
+        departureInfo.predictions
+                .groupBy { stops[it.stopTitle]!! }
+                .map { Pair(it.key, it.value) }
+                .sortedBy { (stop, _) -> GeoLocation.distance(stop.position, userPosition)}
+                .forEach { (stop, predictions) -> appendStopInfoBox(stop, predictions, userPosition) }
+
+        // show info if no predictions were found.
+        if (departureInfo.predictions.isEmpty()) {
+            val manualGeoLink = "https://chrome.google.com/webstore/detail/manual-geolocation/jpiefjlgcjmciajdcinaejedejjfjgki"
+            p { +"No departures found near you." }
+            p { +"Departures are only shown when you are in San Francisco."}
+            p { +"If you want to test this app consider downloading chrome extension:" }
+            p { a(manualGeoLink) { +"Manual Geolocation" } }
+            p {
+                +"or reload the page with parameters: "
+                a("/?lat=37.78111977323265&lon=-122.41983616620172") { +"example" }
+            }
+        }
+    }
+
 }
 
 /**
  * Appends a div which contains info on a specific bus stop.
  */
 private fun TagConsumer<HTMLElement>.appendStopInfoBox(stop: BusStop,
-                                               predictions: List<BusPrediction>,
-                                               userPosition: Position) {
+                                                       predictions: List<BusPrediction>,
+                                                       userPosition: Position) {
     div(classes = "stopInfoBox") {
 
         h3 {
