@@ -114,7 +114,7 @@ You can create complex where filters easily. Supported operators are:
 * GT / GTE
 * LT / GTE
 
-Operators work with strings, numbers, and dates, no matter where they
+Operators work with strings, numbers, and dates, no matter where they are
 in the JSON (e.g. object in array in object in array).
 
 Under the hood a PostgreSQL database-function is dynamically created for
