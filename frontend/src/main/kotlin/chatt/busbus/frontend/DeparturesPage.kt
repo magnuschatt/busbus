@@ -19,13 +19,17 @@ val departuresPage: Page = Page.create("/") {
         }
 
         GeoLocation.getCurrentPosition { userPosition ->
-            Http.get(BackendUrls.departuresNearby(userPosition.latitude, userPosition.longitude, 1000.0)) {
 
-                val departureInfo = JSON.parse<BusDepartureInfo>(it.responseText)
+            val url = BackendUrls.departuresNearby(userPosition.latitude, userPosition.longitude, 1000.0)
+            Http.get(url) { req ->
+
+                val departureInfo = JSON.parse<BusDepartureInfo>(req.responseText)
+
+                // create map of stops with keys = title
                 val stops: Map<String, BusStop> = departureInfo.stops.associateBy { it.title }
 
                 // group predictions by stop (throw exc if stop is missing)
-                // sort entries by distance from user
+                // sort entries by distance from user position
                 // finally for each stop: append HTML info box
                 departureInfo.predictions
                         .groupBy { stops[it.stopTitle]!! }
@@ -46,7 +50,10 @@ val departuresPage: Page = Page.create("/") {
     }
 }
 
-fun TagConsumer<HTMLElement>.appendStopInfoBox(stop: BusStop,
+/**
+ * Appends a div which contains info on a specific bus stop.
+ */
+private fun TagConsumer<HTMLElement>.appendStopInfoBox(stop: BusStop,
                                                predictions: List<BusPrediction>,
                                                userPosition: Position) {
     div(classes = "stopInfoBox") {
@@ -54,6 +61,7 @@ fun TagConsumer<HTMLElement>.appendStopInfoBox(stop: BusStop,
         h3 {
             val mapsLink = "https://www.google.com/maps/?q=${stop.position.latitude},${stop.position.longitude}"
             a(href = mapsLink) { +stop.title }
+
             val distance = GeoLocation.distance(stop.position, userPosition)
             span(classes = "away") { +" (${distance.roundToInt()} meters from you)" }
         }
@@ -62,7 +70,10 @@ fun TagConsumer<HTMLElement>.appendStopInfoBox(stop: BusStop,
     }
 }
 
-fun TagConsumer<HTMLElement>.appendDepartureInfo(prediction: BusPrediction) {
+/**
+ * Appends departure info given a departure prediction
+ */
+private fun TagConsumer<HTMLElement>.appendDepartureInfo(prediction: BusPrediction) {
     p {
         span(classes = "circled") { +prediction.routeTag }
         prediction.directions.forEach { direction ->
@@ -72,7 +83,11 @@ fun TagConsumer<HTMLElement>.appendDepartureInfo(prediction: BusPrediction) {
     }
 }
 
-fun TagConsumer<HTMLElement>.appendDepartureTime(departureTimes: List<Int>) {
+/**
+ * Appends element that shows the amount of time left until next departure.
+ * We want the time left to be updated automatically so we start a scheduled process.
+ */
+private fun TagConsumer<HTMLElement>.appendDepartureTime(departureTimes: List<Int>) {
     span(classes = "departs") {
         val timeElement = b { +"" }
         val pageLoadTime = Date().getTime()
@@ -81,8 +96,14 @@ fun TagConsumer<HTMLElement>.appendDepartureTime(departureTimes: List<Int>) {
     }
 }
 
-fun updateDepartureTime(timeElement: HTMLElement, departureTimes: List<Int>, pageLoadTime: Double) {
+/**
+ * The function that on an interval updates the departure time HTML element with the correct value.
+ * It takes a list of departureTimes originally fetched from the backend.
+ * It ignores the departureTimes that moves into the past.
+ */
+private fun updateDepartureTime(timeElement: HTMLElement, departureTimes: List<Int>, pageLoadTime: Double) {
 
+    // from the list of departure times we grab the next one that is about to happen
     var next = 0
     for (departureTime in departureTimes) {
         next = departureTime
