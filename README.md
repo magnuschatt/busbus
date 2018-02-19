@@ -31,9 +31,9 @@ to be reimplemented)
 
 ### Frontend
 The frontend is a SPA (Single-Page-App) built using a homemade framework.
-The frontend could have been hosted on a separate container (such as a Node.js),
-but because Heroku's free account only allows for a single host, the frontend
-is served by the backend.
+The frontend could be hosted on a separate container (such as a Node.js),
+but because Heroku's free account only allows for a single host,
+the frontend is served by the backend.
 The responsibilities of the frontend are:
 * Register the geo location of the user.
 * Connect to the backend and retrieve nearest stops + departure predictions.
@@ -42,23 +42,23 @@ The responsibilities of the frontend are:
 Interesting files:
 * **frontend.html** (The only HTML file. Runs compiled kotlin js files)
 * **Main.kt** (Entry point of frontend code. Registers web-pages and
-renders the one matching the current URL. Had hoped I had time for
-more pages, as opposed to now where we only register a single page)
-* **DeparturesPage.kt** (This the main page of the web app, fetching and
-displaying the departure info)
+renders the one matching the current URL. I had hoped I had time for
+more pages, as opposed to now where we only register a single one)
+* **DeparturesPage.kt** (Constructs the departures page of the web app,
+ by fetching bus data and generating HTML)
 
 ### Common
-Because everything is written in Kotlin we can share between the frontend
-and backend.
 The common module contains code used by both the frontend and the backend.
 The classes here define the API (including the JSON resources)
 which the frontend & backend uses to communicate.
+With the API clearly defined in a module like this,
+we could with ease switch out the frontend the a more traditional
+non-Kotlin approach.
 
 ## Design choices & take aways
 #### Kotlin
 I went with Kotlin in the hopes that I could shine a new light on web app
-development. I hadn't previously tried sharing code between a
-frontend and a backend but it proved to be very useful, especially when
+development. The common module proved to be very useful, especially when
 modifying the API between them.
 
 Choosing Kotlin did of course have it's downsides:
