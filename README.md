@@ -59,10 +59,7 @@ which the frontend & backend uses to communicate.
 I went with Kotlin in the hopes that I could shine a new light on web app
 development. I hadn't previously tried sharing code between a
 frontend and a backend but it proved to be very useful, especially when
-modifying the API between them. The language itself is as always very
-handy, and makes for quick development and clean, readable, and safe code.
-With Kotlins coroutines I spent less that 2 minutes making the calls
-to NextBus API multithreaded.
+modifying the API between them.
 
 Choosing Kotlin did of course have it's downsides:
 Kotlin on the JVM is working flawlessly, but the JS part is still
