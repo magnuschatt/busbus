@@ -76,9 +76,6 @@ backend framework (Ktor) which could with very little setup expose
 the necessary endpoints. It has close to instant redeploy which allowed
 for quick development. Ktor worked without problems.
 
-Spring was a close alternative, and would probably be a better choice
-if the project were to grow.
-
 #### MongoDB
 Mongo worked without a problem. I chose it for the following reasons:
 * It has 2D geo spatial indexes.
