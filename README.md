@@ -122,6 +122,6 @@ whatever query you give it. This allows for easy monitoring of which
 queries are used most often, and the ability to create indexes
 directly on the JSONB structure.
 
-Please check out this file for a demo of all these features:
+Please check out this file for a demo of this:
 https://github.com/magnuschatt/jbins/blob/master/core/src/test/kotlin/chatt/jbins/test/Showcase.kt
 (also demonstrates how I test if given more time)
