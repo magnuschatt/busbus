@@ -95,3 +95,33 @@ If I had more time I would put my focus on automated tests
 now that the architecture has settled place (other than
 cleaning up the frontend).
 
+#### Extra
+As a side note also check out my separate Jbins framework.
+It's an open source JVM framework that turns your PostgreSQL
+(with JSONB) into a document store, so you get the ease-of-use
+and flexibility from NoSQL combined with transactional data integrity
+from Schema based.
+
+It has the following features:
+* Insert
+* Replace
+* Delete
+* Select
+
+You can create complex where filters easily. Supported operators are:
+* AND / OR
+* EQ / NEQ
+* GT / GTE
+* LT / GTE
+
+Operators work with strings, numbers, and dates, no matter where they
+in the JSON (e.g. object in array in object in array).
+
+Under the hood a PostgreSQL database-function is dynamically created for
+whatever query you give it. This allows for easy monitoring of which
+queries are used most often, and the ability to create indexes
+directly on the JSONB structure.
+
+Please check out this file for a demo of all these features:
+https://github.com/magnuschatt/jbins/blob/master/core/src/test/kotlin/chatt/jbins/test/Showcase.kt
+(also demonstrates how I test if given more time)
