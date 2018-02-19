@@ -100,7 +100,7 @@ As a side note also check out my separate Jbins framework.
 It's an open source JVM framework that turns your PostgreSQL
 (with JSONB) into a document store, so you get the ease-of-use
 and flexibility from NoSQL combined with transactional data integrity
-from Schema based.
+from Schema based databases.
 
 It has the following features:
 * Insert
