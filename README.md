@@ -42,8 +42,9 @@ The responsibilities of the frontend are:
 Interesting files:
 * **frontend.html** (The only HTML file. Runs compiled kotlin js files)
 * **Main.kt** (Entry point of frontend code. Registers web-pages and
-renders the one matching the current URL)
-* **DeparturesPage** (This the main page of the web app, fetching and
+renders the one matching the current URL. Had hoped I had time for
+more pages, as opposed to now where we only register a single page)
+* **DeparturesPage.kt** (This the main page of the web app, fetching and
 displaying the departure info)
 
 ### Common
@@ -89,13 +90,14 @@ Mongo worked without a problem. I chose it for the following reasons:
 * Eventual consistency is okay when dealing with this kind of non-critical bus data.
 
 ## Conclusion
-I'm quite happy about the overall quality of the backend,
-which is also where my experience lies. I underestimated the
-amount of problems I would have with the frontend.
+I'm happy about the overall quality of the backend,
+which is also where my experience lies. The frontend is not
+as pretty. DeparturesPage.kt has too many responsibilities.
+I underestimated the amount of problems I would have with the frontend.
 In hindsight: combining limited CSS knowledge with experimental kotlin
 javascript was as challenging as it was exciting.
 
 If I had more time I would put my focus on automated tests
-now that the architecture has settled place.
-
+now that the architecture has settled place (other than
+cleaning up the frontend).
 
