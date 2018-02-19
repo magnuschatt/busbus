@@ -40,7 +40,7 @@ The responsibilities of the frontend are:
 * Present the information in a user friendly way.
 
 Interesting files:
-* **frontend.html** (Only HTML file. Runs compiled kotlin js files)
+* **frontend.html** (The only HTML file. Runs compiled kotlin js files)
 * **Main.kt** (Entry point of frontend code. Registers web-pages and
 renders the one matching the current URL)
 * **DeparturesPage** (This the main page of the web app, fetching and
@@ -88,5 +88,14 @@ Mongo worked without a problem. I chose it for the following reasons:
 * It's built for scale (if that would become and issue).
 * Eventual consistency is okay when dealing with this kind of non-critical bus data.
 
+## Conclusion
+I'm quite happy about the overall quality of the backend,
+which is also where my experience lies. I underestimated the
+amount of problems I would have with the frontend.
+In hindsight: combining limited CSS knowledge with experimental kotlin
+javascript was as challenging as it was exciting.
+
+If I had more time I would put my focus on automated tests
+now that the architecture has settled place.
 
 
