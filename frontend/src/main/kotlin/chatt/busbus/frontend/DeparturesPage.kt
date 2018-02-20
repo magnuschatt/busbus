@@ -61,7 +61,7 @@ private fun TagConsumer<HTMLElement>.fetchAndAppendDepartureInfo(userPosition: P
             p { a(manualGeoLink) { +"Manual Geolocation" } }
             p {
                 +"or reload the page with parameters: "
-                a("/?lat=37.78111977323265&lon=-122.41983616620172") { +"example" }
+                a("/?lat=37.75994399879872&lon=-122.48560184938708") { +"example" }
             }
         }
     }
@@ -136,9 +136,9 @@ private fun updateDepartureTime(timeElement: HTMLElement, departureTimes: List<I
     val seconds = next % 60
 
     val display = when {
-        hours > 0 -> "$hours hours $minutes minutes"
-        minutes > 0 -> "$minutes minutes"
-        else -> "$seconds seconds"
+        hours > 0 -> "${hours}h ${minutes}m"
+        minutes > 0 -> "${minutes}m"
+        else -> "${seconds}s"
     }
 
     timeElement.innerText = display
