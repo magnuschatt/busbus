@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import kotlinx.coroutines.experimental.Deferred
 import kotlinx.coroutines.experimental.async
 import kotlinx.coroutines.experimental.runBlocking
+import mu.KotlinLogging
 import org.json.XML
 import java.net.URL
 
@@ -16,6 +17,7 @@ import java.net.URL
  */
 class NextBusClient {
 
+    private val logger = KotlinLogging.logger {}
     private val baseCommandUrl = "http://webservices.nextbus.com/service/publicXMLFeed?command="
     private val agencyListUrl = baseCommandUrl + "agencyList"
     private val routeListUrl = baseCommandUrl + "routeList&a=%s"
@@ -24,14 +26,20 @@ class NextBusClient {
     private val jsonMapper = ObjectMapper().apply { registerKotlinModule() }
 
     fun getAgencies(): List<BusAgency> {
+        logger.debug { "Fetching agencies" }
+
         val json = readFromUrl(agencyListUrl)
         val array = json.node("body").node("agency")
-        return array.map {
+        val agencies = array.map {
             BusAgency(
                     tag = it.string("tag"),
                     title = it.string("title")
             )
         }
+
+        logger.info { "Fetched ${agencies.size} agencies from '$agencyListUrl'" }
+        logger.debug { "Agencies fetched: $agencies" }
+        return agencies
     }
 
     fun getRoutes(agencies: List<BusAgency>) = runBlocking {
@@ -41,23 +49,31 @@ class NextBusClient {
     }
 
     fun getRoutes(agency: BusAgency): List<BusRoute> {
+        logger.debug { "Fetching routes for $agency" }
+
         val url = String.format(routeListUrl, agency.tag)
         val json = readFromUrl(url)
         val array = json.node("body").node("route")
-        return array.map {
+        val routes = array.map {
             BusRoute(
                     tag = it.string("tag"),
                     agencyTag = agency.tag,
                     title = it.string("title")
             )
         }
+
+        logger.info { "Fetched ${routes.size} routes from '$url'" }
+        logger.debug { "Routes fetched: $routes" }
+        return routes
     }
 
     fun getStops(route: BusRoute): List<BusStop> {
+        logger.debug { "Fetching stops for $route" }
+
         val url = String.format(routeConfigUrl, route.agencyTag, route.tag)
         val json = readFromUrl(url)
         val array = json.node("body").node("route").node("stop")
-        return array.map {
+        val stops = array.map {
             BusStop(
                     tag = it.string("tag"),
                     title = it.string("title"),
@@ -66,6 +82,10 @@ class NextBusClient {
                     position = Position(it.double("lat"), it.double("lon"))
             )
         }
+
+        logger.info { "Fetched ${stops.size} stops from '$url'" }
+        logger.debug { "Stops fetched: $stops" }
+        return stops
     }
 
     fun getStops(agency: BusAgency): List<BusStop> {
@@ -79,6 +99,8 @@ class NextBusClient {
     }
 
     fun getPredictions(stopList: List<BusStop>): List<BusPrediction> = runBlocking {
+        logger.debug { "Fetching predictions from ${stopList.size} stops" }
+
         val result = mutableListOf<Deferred<List<BusPrediction>>>()
 
         // grouping stops by agency to be able to correctly call NextBusXMLFeed
@@ -92,7 +114,10 @@ class NextBusClient {
                     val stopsString = stops150.joinToString("") { "&stops=${it.routeTag}|${it.tag}" }
                     val url = String.format(predictionsUrl, agencyTag) + stopsString
                     val json = readFromUrl(url)
-                    return@async extractPredictions(json)
+                    val predictions = extractPredictions(json)
+
+                    logger.debug { "Fetched ${predictions.size} predictions from '$url': $predictions" }
+                    return@async predictions
                 }
 
                 result.add(predictions)
@@ -100,7 +125,9 @@ class NextBusClient {
         }
 
         // waiting for jobs to finish
-        return@runBlocking result.flatMap { it.await() }
+        val predictions = result.flatMap { it.await() }
+        logger.info { "Fetched ${predictions.size} predictions from ${stopList.size} stops" }
+        return@runBlocking predictions
     }
 
     private fun extractPredictions(json: JsonNode): List<BusPrediction> {
@@ -126,19 +153,27 @@ class NextBusClient {
 
     private fun readFromUrl(url: String): JsonNode {
         // bug in jackson XML reader make me go through org.json
+
+        logger.debug { "Fetching bus data from: $url" }
         val xml = URL(url).openStream().bufferedReader().readText()
+        logger.trace { "URL '$url' responded: '$xml'" }
+
         val json = XML.toJSONObject(xml).toString()
-        return jsonMapper.readTree(json)
+        val node = jsonMapper.readTree(json)
+
+        logger.debug { "URL '$url' responded (xml converted to json): $node" }
+        return node
     }
 
-    private fun unexpectedXml(key: String, expectedType: String, node: JsonNode): IllegalStateException {
-        val msg = "Unexpected NextBus XML: Expected type='$expectedType' at key='$key' in: $node"
-        return IllegalStateException(msg)
+    private fun unexpectedXml(key: String, expectedType: String, node: JsonNode): Nothing {
+        val msg = "Unexpected NextBus XML response: Expected type='$expectedType' at key='$key' in: $node"
+        logger.error { msg }
+        throw IllegalStateException(msg)
     }
 
     private fun JsonNode.array(key: String) = this.node(key).let { if (it.isArray) it else listOf(it) }
-    private fun JsonNode.node(key: String) = this.get(key) ?: throw unexpectedXml(key, "node", this)
-    private fun JsonNode.string(key: String) = this.get(key)?.asText() ?: throw unexpectedXml(key, "string", this)
-    private fun JsonNode.double(key: String) = this.get(key)?.asDouble() ?: throw unexpectedXml(key, "string", this)
-    private fun JsonNode.int(key: String) = this.get(key)?.asInt() ?: throw unexpectedXml(key, "string", this)
+    private fun JsonNode.node(key: String) = this.get(key) ?: unexpectedXml(key, "node", this)
+    private fun JsonNode.string(key: String) = this.get(key)?.asText() ?: unexpectedXml(key, "string", this)
+    private fun JsonNode.double(key: String) = this.get(key)?.asDouble() ?: unexpectedXml(key, "string", this)
+    private fun JsonNode.int(key: String) = this.get(key)?.asInt() ?: unexpectedXml(key, "string", this)
 }

@@ -1,8 +1,7 @@
 package chatt.busbus.backend.busdata
 
 import chatt.busbus.backend.mongo.MongoBusDatabase
-import chatt.busbus.common.BusPrediction
-import chatt.busbus.common.BusStop
+import chatt.busbus.common.BusDepartureInfo
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -17,35 +16,32 @@ class BusDataService(forceLoadBusData: Boolean = false) {
     private val database: BusDatabase = MongoBusDatabase()
 
     init {
-        if (forceLoadBusData || database.isEmpty()) {
+        val emptyDatabase = database.isEmpty()
+
+        if (forceLoadBusData || emptyDatabase) {
+            logger.info("Loading bus data (forceLoadBusData=$forceLoadBusData, emptyDatabase=$emptyDatabase")
             loadBusData()
         }
     }
 
     private fun loadBusData() {
-        logger.info("Loading bus data")
         database.init()
 
         // for now we only want to work with sf-muni
         val agencies = nextBusClient.getAgencies().filter { it.tag == "sf-muni" }
-        logger.info("Inserting ${agencies.size} agencies")
         database.insertAgencies(agencies)
 
         val routes = nextBusClient.getRoutes(agencies)
-        logger.info("Inserting ${routes.size} routes")
         database.insertRoutes(routes)
 
         val stops = nextBusClient.getStops(routes)
-        logger.info("Inserting ${stops.size} stops")
         database.insertStops(stops)
     }
 
-    fun getStopsNearby(latitude: Double, longitude: Double, maxDistance: Double, limit: Int = 10): List<BusStop> {
-        return database.findNearbyStops(latitude, longitude, maxDistance, limit)
-    }
-
-    fun getPredictions(stops: List<BusStop>): List<BusPrediction> {
-        return nextBusClient.getPredictions(stops)
+    fun getNearbyDepartureInfo(latitude: Double, longitude: Double, maxDistance: Double, limit: Int): Any {
+        val stops = database.findNearbyStops(latitude, longitude, maxDistance, limit)
+        val predictions = nextBusClient.getPredictions(stops)
+        return BusDepartureInfo(stops, predictions)
     }
 
 }

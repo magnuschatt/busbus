@@ -5,10 +5,10 @@ buildscript {
     ext.shadow_version = '2.0.2'
     ext.kotlinx_html_version = '0.6.8'
     ext.kmongo_version = '3.6.1'
-    ext.khttp_version = '0.1.0'
     ext.orgjson_version = '20180130'
     ext.junit_version = '4.12'
     ext.serialization_version = '0.4.1'
+    ext.kotlin_logging_version = '1.5.3'
 
     repositories {
         jcenter()

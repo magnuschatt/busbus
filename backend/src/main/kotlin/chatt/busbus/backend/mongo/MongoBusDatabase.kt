@@ -10,6 +10,7 @@ import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Indexes
 import com.mongodb.client.model.geojson.Point
+import mu.KotlinLogging
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.getCollection
 
@@ -18,6 +19,7 @@ import org.litote.kmongo.getCollection
  */
 class MongoBusDatabase : BusDatabase {
 
+    private val logger = KotlinLogging.logger {}
     private val mongoUri: MongoClientURI = MongoClientURI(System.getenv("MONGODB_URI"))
     private val database: MongoDatabase = KMongo.createClient(mongoUri).getDatabase(mongoUri.database)
     private val agencyCollection = database.getCollection<MongoSchema.Agency>()
@@ -37,24 +39,34 @@ class MongoBusDatabase : BusDatabase {
     }
 
     override fun insertAgencies(agencies: List<BusAgency>) {
+        logger.info { "Inserting ${agencies.size} agencies" }
+
         val docs = agencies.map { it.toMongo() }
         agencyCollection.insertMany(docs)
     }
 
     override fun insertRoutes(routes: List<BusRoute>) {
+        logger.info { "Inserting ${routes.size} routes" }
+
         val docs = routes.map { it.toMongo() }
         routeCollection.insertMany(docs)
     }
 
     override fun insertStops(stops: List<BusStop>) {
+        logger.info { "Inserting ${stops.size} stops" }
+
         val docs = stops.map { it.toMongo() }
         stopCollection.insertMany(docs)
     }
 
     override fun findNearbyStops(latitude: Double, longitude: Double, maxDistance: Double, limit: Int): List<BusStop> {
+        logger.info { "Finding stops near lat=$latitude, lon=$longitude, maxDist=$maxDistance, limit=$limit" }
+
         val point = Point(com.mongodb.client.model.geojson.Position(longitude, latitude)) // lat & lon is flipped in Mongo!
         val filter = Filters.near(positionFieldName, point, maxDistance, 0.0)
         val stops = stopCollection.find(filter).limit(limit).toList()
+
+        logger.info { "Found ${stops.size} stops" }
         return stops.map { it.toCommon() }
     }
 

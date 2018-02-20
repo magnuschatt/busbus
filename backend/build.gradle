@@ -11,9 +11,9 @@ dependencies {
     compile "io.ktor:ktor-jackson:$ktor_version"
     compile "ch.qos.logback:logback-classic:$logback_version"
     compile "org.litote.kmongo:kmongo:$kmongo_version"
-    compile "com.github.jkcclemens:khttp:$khttp_version"
     compile "org.json:json:$orgjson_version"
     compile "org.jetbrains.kotlinx:kotlinx-serialization-runtime:$serialization_version"
+    compile "io.github.microutils:kotlin-logging:$kotlin_logging_version"
 
     testCompile "junit:junit:4.12"
 }
