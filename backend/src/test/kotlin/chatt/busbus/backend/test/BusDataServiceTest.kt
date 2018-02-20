@@ -12,15 +12,10 @@ class BusDataServiceTest {
     private val longitude = -122.40103
     private val distance = 1000000.0 // meters
 
-    private val stops by lazy {
-        busDataService.getStopsNearby(latitude, longitude, distance, 100)
-    }
-
     @Test
     fun smokeTest() {
+        val (stops, predictions) = busDataService.getNearbyDepartureInfo(latitude, longitude, distance, 200)
         assertFalse(stops.isEmpty())
-
-        val predictions = busDataService.getPredictions(stops)
         assertFalse(predictions.isEmpty())
     }
 

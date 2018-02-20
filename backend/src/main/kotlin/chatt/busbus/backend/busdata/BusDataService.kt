@@ -38,7 +38,7 @@ class BusDataService(forceLoadBusData: Boolean = false) {
         database.insertStops(stops)
     }
 
-    fun getNearbyDepartureInfo(latitude: Double, longitude: Double, maxDistance: Double, limit: Int): Any {
+    fun getNearbyDepartureInfo(latitude: Double, longitude: Double, maxDistance: Double, limit: Int): BusDepartureInfo {
         val stops = database.findNearbyStops(latitude, longitude, maxDistance, limit)
         val predictions = nextBusClient.getPredictions(stops)
         return BusDepartureInfo(stops, predictions)
